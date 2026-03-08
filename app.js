@@ -343,30 +343,49 @@ function migrateSchema() {
 }
 
 function seedDemoData() {
-  const users = db.get('users');
-  if (!users || users.length === 0) {
-    db.set('users', [
-      {
-        id: 'u_admin',
-        username: 'admin',
-        email: 'admin@kuponpro.com',
-        password: 'admin123',
-        role: 'admin',
-        favoriteCoupons: [],
-        likedCoupons: [],
-        createdAt: '2025-01-01T00:00:00Z'
-      },
-      {
-        id: 'u_uye1',
-        username: 'uye1',
-        email: 'uye1@kuponpro.com',
-        password: 'uye123',
-        role: 'member',
-        favoriteCoupons: ['c1'],
-        likedCoupons: ['c1', 'c5'],
-        createdAt: '2025-01-15T00:00:00Z'
-      }
-    ]);
+  // Always upsert demo accounts so admin login works even when stale
+  // localStorage data exists from a previous session.
+  let users = db.get('users') || [];
+  let changed = false;
+
+  if (!users.find(function (u) { return u.username === 'admin'; })) {
+    users.unshift({
+      id: 'u_admin',
+      username: 'admin',
+      email: 'admin@kuponpro.com',
+      password: 'admin123',
+      role: 'admin',
+      favoriteCoupons: [],
+      likedCoupons: [],
+      createdAt: '2025-01-01T00:00:00Z'
+    });
+    changed = true;
+  } else {
+    // Ensure the existing admin record has the correct password and role
+    var idx = users.findIndex(function (u) { return u.username === 'admin'; });
+    if (users[idx].password !== 'admin123' || users[idx].role !== 'admin') {
+      users[idx].password = 'admin123';
+      users[idx].role = 'admin';
+      changed = true;
+    }
+  }
+
+  if (!users.find(function (u) { return u.username === 'uye1'; })) {
+    users.push({
+      id: 'u_uye1',
+      username: 'uye1',
+      email: 'uye1@kuponpro.com',
+      password: 'uye123',
+      role: 'member',
+      favoriteCoupons: ['c1'],
+      likedCoupons: ['c1', 'c5'],
+      createdAt: '2025-01-15T00:00:00Z'
+    });
+    changed = true;
+  }
+
+  if (changed) {
+    db.set('users', users);
   }
 
   if (!db.get('coupons') || (db.get('coupons') || []).length === 0) {
