@@ -585,7 +585,7 @@ function filterCoupons(coupons) {
       const inDesc   = (c.description || '').toLowerCase().includes(q);
       const inTags   = (c.tags || []).join(' ').toLowerCase().includes(q);
       const inTeams  = (c.matches || []).map(function (m) {
-        return (m.home + ' ' + m.away).toLowerCase();
+        return (m.home + ' ' + m.away + ' ' + (m.league || '')).toLowerCase();
       }).join(' ').includes(q);
       if (!inTitle && !inDesc && !inTags && !inTeams) return false;
     }
