@@ -165,6 +165,7 @@
         <p class="demo-title"><i class="fa-solid fa-circle-info"></i> Demo Hesaplar</p>
         <div class="demo-list">
           <span class="demo-badge"><strong>admin</strong> / admin123 <em>(Yönetici)</em></span>
+          <span class="demo-badge"><strong>vip1</strong> / vip123 <em>(VIP Üye)</em></span>
           <span class="demo-badge"><strong>uye1</strong> / uye123 <em>(Üye)</em></span>
         </div>
       </div>
@@ -458,6 +459,9 @@
           </div>
         </div>
 
+        <!-- VIP Subscription Info -->
+        <div id="vip-subscription-info" hidden></div>
+
         <!-- Profile Tabs -->
         <div class="profile-tabs">
           <button class="profile-tab active" data-ptab="activity" onclick="switchProfileTab('activity', this)">
@@ -585,6 +589,9 @@
           <button class="admin-tab" data-atab="manage-coupons" onclick="switchAdminTab('manage-coupons', this)">
             <i class="fa-solid fa-list"></i> Kuponlar
           </button>
+          <button class="admin-tab" data-atab="users" onclick="switchAdminTab('users', this)">
+            <i class="fa-solid fa-users"></i> Kullanıcılar
+          </button>
           <button class="admin-tab" data-atab="stats" onclick="switchAdminTab('stats', this)">
             <i class="fa-solid fa-chart-pie"></i> İstatistikler
           </button>
@@ -616,6 +623,7 @@
                 <label for="ac-visibility">Görünürlük</label>
                 <select id="ac-visibility" class="form-input">
                   <option value="public">Herkese Açık</option>
+                  <option value="vip">Yalnızca VIP</option>
                   <option value="members">Yalnızca Üyeler</option>
                   <option value="private">Gizli</option>
                 </select>
@@ -673,6 +681,15 @@
           <div id="admin-coupon-empty" class="empty-state" hidden>
             <i class="fa-solid fa-ticket-simple"></i>
             <p>Henüz kupon eklenmemiş.</p>
+          </div>
+        </div>
+
+        <!-- ── Users Tab ── -->
+        <div id="atab-users" class="admin-tab-content" hidden>
+          <h3 class="section-title"><i class="fa-solid fa-users"></i> Kullanıcı Yönetimi</h3>
+          <p class="view-subtitle" style="margin-bottom:16px;">Kullanıcılara VIP üyelik paketi atayabilirsiniz.</p>
+          <div id="admin-user-list" class="admin-user-list">
+            <!-- Kullanıcı satırları JS tarafından doldurulur -->
           </div>
         </div>
 
@@ -891,6 +908,7 @@
               <label for="edit-visibility">Görünürlük</label>
               <select id="edit-visibility" class="form-input">
                 <option value="public">Herkese Açık</option>
+                <option value="vip">Yalnızca VIP</option>
                 <option value="members">Yalnızca Üyeler</option>
                 <option value="private">Gizli</option>
               </select>

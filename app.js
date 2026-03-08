@@ -23,12 +23,42 @@ const db = {
   }
 };
 
+/* ── VIP PLANS ── */
+
+const VIP_PLANS = {
+  weekly:  { label: 'Haftalık',  days: 7,   price: 1000 },
+  monthly: { label: 'Aylık',     days: 30,  price: 2500 },
+  yearly:  { label: 'Yıllık',    days: 365, price: 7500 }
+};
+
 /* ── AUTH ── */
 
 let currentUser = null;
 
 function initAuth() {
   currentUser = db.get('current_user');
+  if (currentUser) checkAndExpireVip();
+}
+
+function checkAndExpireVip() {
+  if (!currentUser) return;
+  if (currentUser.role === 'vip' && currentUser.vipExpiresAt) {
+    if (new Date() > new Date(currentUser.vipExpiresAt)) {
+      currentUser.role = 'member';
+      currentUser.vipPlan = null;
+      currentUser.vipExpiresAt = null;
+      db.set('current_user', currentUser);
+      const users = db.get('users') || [];
+      const idx = users.findIndex(function (u) { return u.username === currentUser.username; });
+      if (idx > -1) {
+        users[idx].role = 'member';
+        users[idx].vipPlan = null;
+        users[idx].vipExpiresAt = null;
+        db.set('users', users);
+      }
+      showToast('VIP üyeliğiniz sona erdi.', 'info');
+    }
+  }
 }
 
 function handleLogin(e) {
@@ -52,6 +82,22 @@ function handleLogin(e) {
   }
 
   currentUser = Object.assign({}, user);
+  // Check VIP expiry before saving session
+  if (currentUser.role === 'vip' && currentUser.vipExpiresAt) {
+    if (new Date() > new Date(currentUser.vipExpiresAt)) {
+      currentUser.role = 'member';
+      currentUser.vipPlan = null;
+      currentUser.vipExpiresAt = null;
+      const usersToUpdate = db.get('users') || [];
+      const uidx = usersToUpdate.findIndex(function (u) { return u.username === username; });
+      if (uidx > -1) {
+        usersToUpdate[uidx].role = 'member';
+        usersToUpdate[uidx].vipPlan = null;
+        usersToUpdate[uidx].vipExpiresAt = null;
+        db.set('users', usersToUpdate);
+      }
+    }
+  }
   db.set('current_user', currentUser);
   showApp();
 }
@@ -384,6 +430,24 @@ function seedDemoData() {
     changed = true;
   }
 
+  if (!users.find(function (u) { return u.username === 'vip1'; })) {
+    var vipExp = new Date();
+    vipExp.setDate(vipExp.getDate() + 30);
+    users.push({
+      id: 'u_vip1',
+      username: 'vip1',
+      email: 'vip1@kuponpro.com',
+      password: 'vip123',
+      role: 'vip',
+      vipPlan: 'monthly',
+      vipExpiresAt: vipExp.toISOString(),
+      favoriteCoupons: [],
+      likedCoupons: [],
+      createdAt: '2025-02-01T00:00:00Z'
+    });
+    changed = true;
+  }
+
   if (changed) {
     db.set('users', users);
   }
@@ -507,6 +571,7 @@ function showView(viewName) {
   } else if (viewName === 'admin') {
     renderAdminStats();
     renderAdminCouponList();
+    renderAdminUserList();
     const acMatches = document.getElementById('ac-matches');
     if (acMatches && acMatches.children.length === 0) addMatchRow('ac-matches');
   }
@@ -1279,7 +1344,69 @@ function renderProfile() {
   if (pComments) pComments.textContent = commentCount;
   if (pCoupons)  pCoupons.textContent  = favCount;
 
+  renderVipInfo();
   renderActivityGraph();
+}
+
+function renderVipInfo() {
+  const vipInfoEl = document.getElementById('vip-subscription-info');
+  if (!vipInfoEl || !currentUser) return;
+
+  if (currentUser.role === 'vip' && currentUser.vipExpiresAt) {
+    const expDate = new Date(currentUser.vipExpiresAt);
+    const now     = new Date();
+    const msLeft  = expDate - now;
+    const daysLeft = Math.max(0, Math.ceil(msLeft / 86400000));
+    const planInfo = VIP_PLANS[currentUser.vipPlan] || { label: 'VIP' };
+
+    vipInfoEl.hidden = false;
+    vipInfoEl.innerHTML =
+      '<div class="vip-info-card">' +
+        '<div class="vip-info-header">' +
+          '<i class="fa-solid fa-crown"></i>' +
+          '<span>Aktif VIP Üyelik</span>' +
+        '</div>' +
+        '<div class="vip-info-body">' +
+          '<div class="vip-info-row">' +
+            '<span class="vip-info-label">Paket</span>' +
+            '<span class="vip-info-value">' + planInfo.label + ' (' + (planInfo.price || '') + '₺)</span>' +
+          '</div>' +
+          '<div class="vip-info-row">' +
+            '<span class="vip-info-label">Bitiş Tarihi</span>' +
+            '<span class="vip-info-value">' + formatDate(expDate.toISOString().split('T')[0]) + '</span>' +
+          '</div>' +
+          '<div class="vip-info-row">' +
+            '<span class="vip-info-label">Kalan Süre</span>' +
+            '<span class="vip-info-value ' + (daysLeft <= 3 ? 'expiring-soon' : '') + '">' +
+              (daysLeft === 0 ? 'Bugün sona eriyor!' : daysLeft + ' gün') +
+            '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  } else if (currentUser.role === 'member') {
+    vipInfoEl.hidden = false;
+    vipInfoEl.innerHTML =
+      '<div class="vip-info-card vip-info-upgrade">' +
+        '<div class="vip-info-header">' +
+          '<i class="fa-solid fa-crown"></i>' +
+          '<span>VIP Üyelik</span>' +
+        '</div>' +
+        '<p class="vip-info-desc">VIP üyeler özel kuponlara erişebilir. Yöneticinizle iletişime geçin.</p>' +
+        '<div class="vip-plan-grid">' +
+          Object.entries(VIP_PLANS).map(function (entry) {
+            var key = entry[0]; var plan = entry[1];
+            return (
+              '<div class="vip-plan-card">' +
+                '<div class="vip-plan-name">' + plan.label + '</div>' +
+                '<div class="vip-plan-price">' + plan.price.toLocaleString('tr-TR') + '₺</div>' +
+              '</div>'
+            );
+          }).join('') +
+        '</div>' +
+      '</div>';
+  } else {
+    vipInfoEl.hidden = true;
+  }
 }
 
 function switchProfileTab(tab, btn) {
@@ -1567,10 +1694,128 @@ function switchAdminTab(tab, btn) {
   }
   if (tab === 'manage-coupons') renderAdminCouponList();
   if (tab === 'stats')          renderAdminStats();
+  if (tab === 'users')          renderAdminUserList();
   if (tab === 'add-coupon') {
     const acMatches = document.getElementById('ac-matches');
     if (acMatches && acMatches.children.length === 0) addMatchRow('ac-matches');
   }
+}
+
+function renderAdminUserList() {
+  const listEl = document.getElementById('admin-user-list');
+  if (!listEl) return;
+
+  const users = db.get('users') || [];
+  const now   = new Date();
+
+  if (users.length === 0) {
+    listEl.innerHTML = '<p class="empty-hint">Kullanıcı bulunamadı.</p>';
+    return;
+  }
+
+  const ROLE_LABELS = { admin: 'Yönetici', vip: 'VIP Üye', member: 'Üye' };
+
+  listEl.innerHTML = users.map(function (u) {
+    // Calculate days remaining for VIP
+    var vipMeta = '';
+    if (u.role === 'vip' && u.vipExpiresAt) {
+      var exp      = new Date(u.vipExpiresAt);
+      var msLeft   = exp - now;
+      var daysLeft = Math.max(0, Math.ceil(msLeft / 86400000));
+      var planLabel = (VIP_PLANS[u.vipPlan] || {}).label || 'VIP';
+      vipMeta =
+        '<span class="admin-user-vip-meta">' +
+          planLabel + ' · ' +
+          (daysLeft === 0 ? 'Bugün bitiyor!' : daysLeft + ' gün kaldı') +
+        '</span>';
+    }
+
+    var grantControls = '';
+    if (u.role !== 'admin') {
+      var grantSelect =
+        '<select class="form-input form-input-sm admin-vip-select" id="vip-sel-' + u.username + '">' +
+          Object.entries(VIP_PLANS).map(function (entry) {
+            return '<option value="' + entry[0] + '">' + entry[1].label + ' – ' + entry[1].price.toLocaleString('tr-TR') + '₺</option>';
+          }).join('') +
+        '</select>';
+      var grantBtn =
+        '<button class="btn btn-xs btn-vip" onclick="grantVip(\'' + u.username + '\')">' +
+          '<i class="fa-solid fa-crown"></i> VIP Ver' +
+        '</button>';
+      var revokeBtn = u.role === 'vip'
+        ? '<button class="btn btn-xs btn-danger" onclick="revokeVip(\'' + u.username + '\')">' +
+            '<i class="fa-solid fa-ban"></i> Kaldır' +
+          '</button>'
+        : '';
+      grantControls = grantSelect + grantBtn + revokeBtn;
+    }
+
+    return (
+      '<div class="admin-user-row" data-username="' + sanitizeHTML(u.username) + '">' +
+        '<div class="admin-user-avatar">' + sanitizeHTML(u.username[0].toUpperCase()) + '</div>' +
+        '<div class="admin-user-info">' +
+          '<span class="admin-user-name">' + sanitizeHTML(u.username) + '</span>' +
+          '<span class="admin-user-email">' + sanitizeHTML(u.email || '') + '</span>' +
+        '</div>' +
+        '<div class="admin-user-role">' +
+          '<span class="role-badge role-' + sanitizeHTML(u.role) + '">' + (ROLE_LABELS[u.role] || u.role) + '</span>' +
+          vipMeta +
+        '</div>' +
+        '<div class="admin-user-controls">' + grantControls + '</div>' +
+      '</div>'
+    );
+  }).join('');
+}
+
+function grantVip(username) {
+  var selectEl = document.getElementById('vip-sel-' + username);
+  var plan     = selectEl ? selectEl.value : 'monthly';
+  if (!VIP_PLANS[plan]) return;
+
+  var users = db.get('users') || [];
+  var idx   = users.findIndex(function (u) { return u.username === username; });
+  if (idx === -1) return;
+
+  var exp = new Date();
+  exp.setDate(exp.getDate() + VIP_PLANS[plan].days);
+
+  users[idx].role         = 'vip';
+  users[idx].vipPlan      = plan;
+  users[idx].vipExpiresAt = exp.toISOString();
+  db.set('users', users);
+
+  if (currentUser && currentUser.username === username) {
+    currentUser.role         = 'vip';
+    currentUser.vipPlan      = plan;
+    currentUser.vipExpiresAt = exp.toISOString();
+    db.set('current_user', currentUser);
+  }
+
+  renderAdminUserList();
+  showToast(username + ' kullanıcısına ' + VIP_PLANS[plan].label + ' VIP verildi! 👑', 'success');
+}
+
+function revokeVip(username) {
+  openConfirmModal(username + ' kullanıcısının VIP üyeliğini kaldırmak istiyor musunuz?', function () {
+    var users = db.get('users') || [];
+    var idx   = users.findIndex(function (u) { return u.username === username; });
+    if (idx === -1) return;
+
+    users[idx].role         = 'member';
+    users[idx].vipPlan      = null;
+    users[idx].vipExpiresAt = null;
+    db.set('users', users);
+
+    if (currentUser && currentUser.username === username) {
+      currentUser.role         = 'member';
+      currentUser.vipPlan      = null;
+      currentUser.vipExpiresAt = null;
+      db.set('current_user', currentUser);
+    }
+
+    renderAdminUserList();
+    showToast(username + ' kullanıcısının VIP üyeliği kaldırıldı.', 'info');
+  });
 }
 
 function addMatchRow(containerId) {

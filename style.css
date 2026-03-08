@@ -2743,3 +2743,237 @@ body.light .bottom-nav {
     padding-bottom: 64px;
   }
 }
+
+/* ── VIP Info Card (Profile) ─────────────────────────────── */
+
+.vip-info-card {
+  background: linear-gradient(135deg, rgba(108,99,255,.15) 0%, rgba(167,139,250,.1) 100%);
+  border: 1.5px solid rgba(108,99,255,.35);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+.vip-info-card.vip-info-upgrade {
+  background: rgba(255,255,255,.04);
+  border-color: var(--card-border);
+}
+
+.vip-info-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--accent2);
+  margin-bottom: 14px;
+}
+
+.vip-info-header i {
+  color: #f59e0b;
+}
+
+.vip-info-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vip-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+}
+
+.vip-info-label {
+  color: var(--text2);
+}
+
+.vip-info-value {
+  font-weight: 600;
+}
+
+.vip-info-value.expiring-soon {
+  color: var(--red);
+}
+
+.vip-info-desc {
+  font-size: 0.85rem;
+  color: var(--text2);
+  margin-bottom: 14px;
+}
+
+/* VIP Plan Cards */
+.vip-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.vip-plan-card {
+  background: var(--bg2);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  text-align: center;
+}
+
+.vip-plan-name {
+  font-size: 0.78rem;
+  color: var(--text2);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.vip-plan-price {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--accent2);
+}
+
+/* ── Admin User List ─────────────────────────────────────── */
+
+.admin-user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-user-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  flex-wrap: wrap;
+  transition: border-color var(--transition);
+}
+
+.admin-user-row:hover {
+  border-color: var(--accent);
+}
+
+.admin-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.admin-user-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 100px;
+}
+
+.admin-user-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.admin-user-email {
+  font-size: 0.76rem;
+  color: var(--text2);
+}
+
+.admin-user-role {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 90px;
+}
+
+.admin-user-vip-meta {
+  font-size: 0.72rem;
+  color: var(--accent2);
+  font-weight: 600;
+}
+
+.admin-user-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.form-input-sm {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  height: auto;
+  min-width: 140px;
+}
+
+/* VIP grant button */
+.btn-vip {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 5px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+.btn-vip:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+/* role-badge colours */
+.role-badge.role-vip {
+  background: rgba(245,158,11,.15);
+  color: #f59e0b;
+  border-color: rgba(245,158,11,.3);
+}
+
+.role-badge.role-admin {
+  background: rgba(239,68,68,.12);
+  color: #ef4444;
+  border-color: rgba(239,68,68,.25);
+}
+
+.role-badge.role-member {
+  background: rgba(108,99,255,.15);
+  color: var(--accent2);
+  border-color: rgba(108,99,255,.25);
+}
+
+/* empty hint */
+.empty-hint {
+  color: var(--text2);
+  font-size: 0.9rem;
+  padding: 20px 0;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .vip-plan-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .admin-user-controls {
+    width: 100%;
+  }
+
+  .form-input-sm {
+    min-width: 120px;
+  }
+}
