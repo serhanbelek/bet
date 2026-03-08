@@ -672,7 +672,7 @@ function buildCouponCard(coupon) {
     : '';
 
   return (
-    '<article class="coupon-card' + (coupon.status === 'won' ? ' card-won' : '') + '" data-id="' + coupon.id + '">' +
+    '<article class="coupon-card" data-id="' + coupon.id + '" data-status="' + (coupon.status || 'open') + '">' +
       '<div class="card-header">' +
         '<div class="card-title-row">' +
           '<h3 class="card-title">' + titleText + '</h3>' +
