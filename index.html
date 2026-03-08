@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KuponPRO v2</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome 6.5 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       AUTH SCREEN
+  ════════════════════════════════════════════════════════════ -->
+  <div id="auth-screen">
+    <div class="auth-card">
+
+      <!-- Logo -->
+      <div class="auth-logo">
+        <i class="fa-solid fa-crown"></i>
+        <span>KuponPRO</span>
+      </div>
+      <p class="auth-tagline">Türkiye'nin en iyi kupon paylaşım platformu</p>
+
+      <!-- Tab Buttons -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login" onclick="switchAuthTab('login')">
+          <i class="fa-solid fa-right-to-bracket"></i> Giriş Yap
+        </button>
+        <button class="auth-tab" data-tab="register" onclick="switchAuthTab('register')">
+          <i class="fa-solid fa-user-plus"></i> Kayıt Ol
+        </button>
+      </div>
+
+      <!-- ── Login Form ── -->
+      <form id="login-form" class="auth-form active" onsubmit="handleLogin(event)" novalidate>
+
+        <div class="form-group">
+          <label for="login-username">
+            <i class="fa-solid fa-user"></i> Kullanıcı Adı
+          </label>
+          <input
+            type="text"
+            id="login-username"
+            class="form-input"
+            placeholder="Kullanıcı adınız"
+            autocomplete="username"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">
+            <i class="fa-solid fa-lock"></i> Şifre
+          </label>
+          <div class="input-with-toggle">
+            <input
+              type="password"
+              id="login-password"
+              class="form-input"
+              placeholder="Şifreniz"
+              autocomplete="current-password"
+              required
+            />
+            <button type="button" class="toggle-password" aria-label="Şifreyi göster/gizle" onclick="togglePassword('login-password', this)">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="login-error" class="auth-error" hidden></div>
+
+        <button type="submit" class="btn btn-primary btn-full">
+          <i class="fa-solid fa-right-to-bracket"></i> Giriş Yap
+        </button>
+      </form>
+
+      <!-- ── Register Form ── -->
+      <form id="register-form" class="auth-form" onsubmit="handleRegister(event)" novalidate>
+
+        <div class="form-group">
+          <label for="reg-username">
+            <i class="fa-solid fa-user"></i> Kullanıcı Adı
+          </label>
+          <input
+            type="text"
+            id="reg-username"
+            class="form-input"
+            placeholder="Kullanıcı adınız"
+            autocomplete="username"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="reg-email">
+            <i class="fa-solid fa-envelope"></i> E-posta
+          </label>
+          <input
+            type="email"
+            id="reg-email"
+            class="form-input"
+            placeholder="ornek@eposta.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="reg-password">
+            <i class="fa-solid fa-lock"></i> Şifre
+          </label>
+          <div class="input-with-toggle">
+            <input
+              type="password"
+              id="reg-password"
+              class="form-input"
+              placeholder="En az 6 karakter"
+              autocomplete="new-password"
+              required
+            />
+            <button type="button" class="toggle-password" aria-label="Şifreyi göster/gizle" onclick="togglePassword('reg-password', this)">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-password2">
+            <i class="fa-solid fa-lock"></i> Şifre Tekrar
+          </label>
+          <div class="input-with-toggle">
+            <input
+              type="password"
+              id="reg-password2"
+              class="form-input"
+              placeholder="Şifrenizi tekrar girin"
+              autocomplete="new-password"
+              required
+            />
+            <button type="button" class="toggle-password" aria-label="Şifreyi göster/gizle" onclick="togglePassword('reg-password2', this)">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="register-error" class="auth-error" hidden></div>
+
+        <button type="submit" class="btn btn-primary btn-full">
+          <i class="fa-solid fa-user-plus"></i> Kayıt Ol
+        </button>
+      </form>
+
+      <!-- Demo Accounts -->
+      <div class="demo-accounts">
+        <p class="demo-title"><i class="fa-solid fa-circle-info"></i> Demo Hesaplar</p>
+        <div class="demo-list">
+          <span class="demo-badge"><strong>admin</strong> / admin123 <em>(Yönetici)</em></span>
+          <span class="demo-badge"><strong>uye1</strong> / uye123 <em>(Üye)</em></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- /auth-screen -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MAIN APP
+  ════════════════════════════════════════════════════════════ -->
+  <div id="app" hidden>
+
+    <!-- ── Navbar ── -->
+    <nav id="navbar" class="navbar">
+      <div class="nav-container">
+
+        <!-- Logo -->
+        <a href="#" class="nav-logo" onclick="showView('feed'); return false;">
+          <i class="fa-solid fa-crown"></i>
+          <span>KuponPRO</span>
+        </a>
+
+        <!-- Desktop Nav Links -->
+        <ul class="nav-links">
+          <li>
+            <a href="#" class="nav-link active" data-view="feed" onclick="showView('feed'); return false;">
+              <i class="fa-solid fa-ticket"></i> Kuponlar
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-view="favorites" onclick="showView('favorites'); return false;">
+              <i class="fa-solid fa-heart"></i> Favorilerim
+            </a>
+          </li>
+        </ul>
+
+        <!-- Right Controls -->
+        <div class="nav-right">
+
+          <!-- Notification Bell -->
+          <div class="notification-wrapper">
+            <button id="notif-btn" class="icon-btn" aria-label="Bildirimler" onclick="toggleNotificationPanel()">
+              <i class="fa-solid fa-bell"></i>
+              <span id="notif-badge" class="badge" hidden>0</span>
+            </button>
+            <!-- Notification Panel (rendered here, toggled by JS) -->
+            <div id="notification-panel" class="notification-panel" hidden>
+              <div class="notif-header">
+                <span><i class="fa-solid fa-bell"></i> Bildirimler</span>
+                <button class="notif-clear-btn" onclick="clearAllNotifications()">
+                  <i class="fa-solid fa-check-double"></i> Tümünü Okundu İşaretle
+                </button>
+              </div>
+              <ul id="notif-list" class="notif-list">
+                <!-- Bildirimler JS tarafından doldurulur -->
+              </ul>
+              <div id="notif-empty" class="notif-empty" hidden>
+                <i class="fa-regular fa-bell-slash"></i>
+                <p>Henüz bildirim yok</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Theme Toggle -->
+          <button id="theme-toggle" class="icon-btn" aria-label="Tema değiştir" onclick="toggleTheme()">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+
+          <!-- User Pill -->
+          <div class="user-pill">
+            <div class="user-avatar" id="nav-avatar">U</div>
+            <span id="nav-username" class="user-name">Kullanıcı</span>
+            <button class="icon-btn logout-btn" aria-label="Çıkış yap" onclick="handleLogout()" title="Çıkış Yap">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </nav>
+    <!-- /navbar -->
+
+
+    <!-- ── Main Content ── -->
+    <main id="main-content" class="main-content">
+
+      <!-- ──────────────────────────────────────────────
+           FEED VIEW (default)
+      ─────────────────────────────────────────────── -->
+      <div id="feed-view">
+
+        <!-- Hero / Stats Section -->
+        <section class="hero-section">
+          <div class="hero-inner">
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-ticket"></i></div>
+                <div class="stat-body">
+                  <span class="stat-label">Toplam Kupon</span>
+                  <span class="stat-value" id="stat-total">0</span>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon green"><i class="fa-solid fa-percent"></i></div>
+                <div class="stat-body">
+                  <span class="stat-label">Kazanma Oranı</span>
+                  <span class="stat-value" id="stat-winrate">%0</span>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon blue"><i class="fa-solid fa-hashtag"></i></div>
+                <div class="stat-body">
+                  <span class="stat-label">Toplam Oran</span>
+                  <span class="stat-value" id="stat-odds">0.00</span>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon gold"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="stat-body">
+                  <span class="stat-label">ROI</span>
+                  <span class="stat-value" id="stat-roi">%0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Son Kazanan Mini Card -->
+            <div class="last-winner-card" id="last-winner-card">
+              <div class="winner-label">
+                <i class="fa-solid fa-trophy"></i> Son Kazanan
+              </div>
+              <div id="last-winner-content" class="winner-content">
+                <!-- JS tarafından doldurulur -->
+                <span class="winner-placeholder">Henüz kazanan kupon yok</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+        <!-- /hero-section -->
+
+        <!-- Toolbar -->
+        <section class="toolbar-section">
+          <div class="toolbar-inner">
+
+            <!-- Search -->
+            <div class="search-wrapper">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input
+                type="search"
+                id="search-input"
+                class="search-input"
+                placeholder="Kupon, takım veya etiket ara..."
+                oninput="handleSearch(this.value)"
+                autocomplete="off"
+              />
+              <button class="search-clear" id="search-clear" onclick="clearSearch()" hidden aria-label="Aramayı temizle">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <!-- Sort Dropdown -->
+            <div class="sort-wrapper">
+              <label for="sort-select" class="sr-only">Sırala</label>
+              <select id="sort-select" class="sort-select" onchange="handleSort(this.value)">
+                <option value="newest">En Yeni</option>
+                <option value="highest-odds">En Yüksek Oran</option>
+                <option value="most-liked">En Çok Beğenilen</option>
+                <option value="most-commented">En Çok Yorum</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- Filter Buttons -->
+          <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all" onclick="handleFilter('all', this)">
+              <i class="fa-solid fa-border-all"></i> Tümü
+            </button>
+            <button class="filter-btn" data-filter="open" onclick="handleFilter('open', this)">
+              <i class="fa-solid fa-hourglass-half"></i> Açık
+            </button>
+            <button class="filter-btn" data-filter="won" onclick="handleFilter('won', this)">
+              <i class="fa-solid fa-check-circle"></i> Kazandı
+            </button>
+            <button class="filter-btn" data-filter="lost" onclick="handleFilter('lost', this)">
+              <i class="fa-solid fa-times-circle"></i> Kaybetti
+            </button>
+            <button class="filter-btn" data-filter="tomorrow" onclick="handleFilter('tomorrow', this)">
+              <i class="fa-solid fa-calendar-day"></i> Yarın
+            </button>
+          </div>
+
+          <!-- Search Result Count -->
+          <p id="search-count" class="search-count" hidden></p>
+        </section>
+        <!-- /toolbar-section -->
+
+        <!-- Skeleton Loading -->
+        <div id="skeleton-container" class="skeleton-container" hidden>
+          <div class="skeleton-card">
+            <div class="skeleton-line wide"></div>
+            <div class="skeleton-line medium"></div>
+            <div class="skeleton-line short"></div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton-line wide"></div>
+            <div class="skeleton-line medium"></div>
+            <div class="skeleton-line short"></div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton-line wide"></div>
+            <div class="skeleton-line medium"></div>
+            <div class="skeleton-line short"></div>
+          </div>
+        </div>
+
+        <!-- Coupon Feed -->
+        <section id="feed" class="feed" aria-label="Kupon listesi">
+          <!-- Kupon kartları JS tarafından doldurulur -->
+        </section>
+
+        <!-- Empty State -->
+        <div id="feed-empty" class="empty-state" hidden>
+          <i class="fa-solid fa-ticket-simple"></i>
+          <h3>Kupon bulunamadı</h3>
+          <p>Arama veya filtre kriterlerinize uygun kupon yok.</p>
+        </div>
+
+        <!-- Load More -->
+        <div class="load-more-wrapper">
+          <button id="load-more-btn" class="btn btn-outline" onclick="loadMoreCoupons()" hidden>
+            <i class="fa-solid fa-chevron-down"></i> Daha Fazla Yükle
+          </button>
+        </div>
+
+      </div>
+      <!-- /feed-view -->
+
+
+      <!-- ──────────────────────────────────────────────
+           FAVORITES VIEW
+      ─────────────────────────────────────────────── -->
+      <div id="favorites-view" hidden>
+        <div class="view-header">
+          <h2><i class="fa-solid fa-heart"></i> Favorilerim</h2>
+          <p class="view-subtitle">Beğendiğiniz ve kaydettiğiniz kuponlar</p>
+        </div>
+
+        <section id="favorites-feed" class="feed" aria-label="Favori kuponlar">
+          <!-- Favori kuponlar JS tarafından doldurulur -->
+        </section>
+
+        <div id="favorites-empty" class="empty-state" hidden>
+          <i class="fa-regular fa-heart"></i>
+          <h3>Henüz favori kuponunuz yok</h3>
+          <p>Beğendiğiniz kuponlar burada görünecek.</p>
+        </div>
+      </div>
+      <!-- /favorites-view -->
+
+
+      <!-- ──────────────────────────────────────────────
+           PROFILE VIEW
+      ─────────────────────────────────────────────── -->
+      <div id="profile-view" hidden>
+
+        <!-- Profile Header -->
+        <div class="profile-header">
+          <div class="profile-avatar-lg" id="profile-avatar-lg">U</div>
+          <div class="profile-info">
+            <h2 id="profile-username-display" class="profile-username">Kullanıcı</h2>
+            <span id="profile-role-badge" class="role-badge">Üye</span>
+            <div class="profile-stats">
+              <div class="pstat">
+                <span class="pstat-value" id="pstat-coupons">0</span>
+                <span class="pstat-label">Kupon</span>
+              </div>
+              <div class="pstat">
+                <span class="pstat-value" id="pstat-likes">0</span>
+                <span class="pstat-label">Beğeni</span>
+              </div>
+              <div class="pstat">
+                <span class="pstat-value" id="pstat-comments">0</span>
+                <span class="pstat-label">Yorum</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Tabs -->
+        <div class="profile-tabs">
+          <button class="profile-tab active" data-ptab="activity" onclick="switchProfileTab('activity', this)">
+            <i class="fa-solid fa-chart-bar"></i> Aktivite
+          </button>
+          <button class="profile-tab" data-ptab="liked" onclick="switchProfileTab('liked', this)">
+            <i class="fa-solid fa-heart"></i> Beğendiğim Kuponlar
+          </button>
+        </div>
+
+        <!-- Activity Tab -->
+        <div id="ptab-activity" class="profile-tab-content active">
+
+          <!-- 7-Day Activity Graph (SVG) -->
+          <div class="activity-graph-wrapper">
+            <h3 class="section-title"><i class="fa-solid fa-chart-bar"></i> 7 Günlük Aktivite</h3>
+            <div class="activity-graph">
+              <svg id="activity-svg" viewBox="0 0 420 120" xmlns="http://www.w3.org/2000/svg" aria-label="7 günlük aktivite grafiği" role="img">
+                <!-- Eksenler -->
+                <line x1="40" y1="10" x2="40" y2="100" class="graph-axis" />
+                <line x1="40" y1="100" x2="410" y2="100" class="graph-axis" />
+                <!-- Çubuklar ve etiketler JS tarafından doldurulur -->
+                <g id="activity-bars"></g>
+                <g id="activity-labels"></g>
+              </svg>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Liked Coupons Tab -->
+        <div id="ptab-liked" class="profile-tab-content" hidden>
+          <h3 class="section-title"><i class="fa-solid fa-heart"></i> Beğendiğim Kuponlar</h3>
+          <ul id="liked-coupons-list" class="liked-list">
+            <!-- JS tarafından doldurulur -->
+          </ul>
+          <div id="liked-empty" class="empty-state" hidden>
+            <i class="fa-regular fa-heart"></i>
+            <p>Henüz beğendiğiniz kupon yok.</p>
+          </div>
+        </div>
+
+        <!-- Change Password Section -->
+        <div class="change-password-section">
+          <h3 class="section-title"><i class="fa-solid fa-key"></i> Şifre Değiştir</h3>
+          <form id="change-password-form" class="change-pw-form" onsubmit="handleChangePassword(event)" novalidate>
+
+            <div class="form-group">
+              <label for="cp-current">Mevcut Şifre</label>
+              <div class="input-with-toggle">
+                <input
+                  type="password"
+                  id="cp-current"
+                  class="form-input"
+                  placeholder="Mevcut şifreniz"
+                  autocomplete="current-password"
+                  required
+                />
+                <button type="button" class="toggle-password" aria-label="Şifreyi göster/gizle" onclick="togglePassword('cp-current', this)">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="cp-new">Yeni Şifre</label>
+              <div class="input-with-toggle">
+                <input
+                  type="password"
+                  id="cp-new"
+                  class="form-input"
+                  placeholder="En az 6 karakter"
+                  autocomplete="new-password"
+                  required
+                />
+                <button type="button" class="toggle-password" aria-label="Şifreyi göster/gizle" onclick="togglePassword('cp-new', this)">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="cp-confirm">Yeni Şifre Tekrar</label>
+              <div class="input-with-toggle">
+                <input
+                  type="password"
+                  id="cp-confirm"
+                  class="form-input"
+                  placeholder="Yeni şifrenizi tekrar girin"
+                  autocomplete="new-password"
+                  required
+                />
+                <button type="button" class="toggle-password" aria-label="Şifreyi göster/gizle" onclick="togglePassword('cp-confirm', this)">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div id="cp-error" class="auth-error" hidden></div>
+            <div id="cp-success" class="auth-success" hidden></div>
+
+            <button type="submit" class="btn btn-primary">
+              <i class="fa-solid fa-floppy-disk"></i> Şifreyi Güncelle
+            </button>
+          </form>
+        </div>
+
+      </div>
+      <!-- /profile-view -->
+
+
+      <!-- ──────────────────────────────────────────────
+           ADMIN VIEW
+      ─────────────────────────────────────────────── -->
+      <div id="admin-view" hidden>
+        <div class="view-header">
+          <h2><i class="fa-solid fa-shield-halved"></i> Yönetim Paneli</h2>
+        </div>
+
+        <!-- Admin Tabs -->
+        <div class="admin-tabs">
+          <button class="admin-tab active" data-atab="add-coupon" onclick="switchAdminTab('add-coupon', this)">
+            <i class="fa-solid fa-plus"></i> Kupon Ekle
+          </button>
+          <button class="admin-tab" data-atab="manage-coupons" onclick="switchAdminTab('manage-coupons', this)">
+            <i class="fa-solid fa-list"></i> Kuponlar
+          </button>
+          <button class="admin-tab" data-atab="stats" onclick="switchAdminTab('stats', this)">
+            <i class="fa-solid fa-chart-pie"></i> İstatistikler
+          </button>
+        </div>
+
+        <!-- ── Add Coupon Tab ── -->
+        <div id="atab-add-coupon" class="admin-tab-content active">
+          <h3 class="section-title"><i class="fa-solid fa-ticket-simple"></i> Yeni Kupon Ekle</h3>
+          <form id="add-coupon-form" class="coupon-form" onsubmit="handleAddCoupon(event)" novalidate>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ac-title">Başlık</label>
+                <input type="text" id="ac-title" class="form-input" placeholder="Kupon başlığı" required />
+              </div>
+              <div class="form-group">
+                <label for="ac-date">Tarih</label>
+                <input type="date" id="ac-date" class="form-input" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="ac-description">Açıklama</label>
+              <textarea id="ac-description" class="form-input form-textarea" placeholder="Kupon hakkında kısa açıklama..." rows="3"></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ac-visibility">Görünürlük</label>
+                <select id="ac-visibility" class="form-input">
+                  <option value="public">Herkese Açık</option>
+                  <option value="members">Yalnızca Üyeler</option>
+                  <option value="private">Gizli</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ac-tags">Etiketler</label>
+                <select id="ac-tags" class="form-input" multiple>
+                  <option value="futbol">Futbol</option>
+                  <option value="basketbol">Basketbol</option>
+                  <option value="tenis">Tenis</option>
+                  <option value="voleybol">Voleybol</option>
+                  <option value="iddaa">İddaa</option>
+                  <option value="canli">Canlı</option>
+                  <option value="kombinasyon">Kombinasyon</option>
+                  <option value="sistem">Sistem</option>
+                </select>
+                <small class="form-hint">Birden fazla seçmek için Ctrl basılı tutun</small>
+              </div>
+            </div>
+
+            <!-- Match Rows -->
+            <div class="matches-section">
+              <div class="matches-header">
+                <label><i class="fa-solid fa-futbol"></i> Maçlar</label>
+                <button type="button" class="btn btn-sm btn-outline" onclick="addMatchRow('ac-matches')">
+                  <i class="fa-solid fa-plus"></i> Maç Ekle
+                </button>
+              </div>
+              <div id="ac-matches" class="matches-list">
+                <!-- İlk boş satır JS addMatchRow() ile eklenir; sayfa yüklenince JS tetikler -->
+              </div>
+            </div>
+
+            <div id="add-coupon-error" class="auth-error" hidden></div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i> Kuponu Ekle
+              </button>
+              <button type="reset" class="btn btn-ghost" onclick="resetAddCouponForm()">
+                <i class="fa-solid fa-rotate-left"></i> Sıfırla
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ── Manage Coupons Tab ── -->
+        <div id="atab-manage-coupons" class="admin-tab-content" hidden>
+          <div class="manage-header">
+            <h3 class="section-title"><i class="fa-solid fa-list-check"></i> Tüm Kuponlar</h3>
+          </div>
+          <div id="admin-coupon-list" class="admin-coupon-list">
+            <!-- Kupon satırları JS tarafından doldurulur -->
+          </div>
+          <div id="admin-coupon-empty" class="empty-state" hidden>
+            <i class="fa-solid fa-ticket-simple"></i>
+            <p>Henüz kupon eklenmemiş.</p>
+          </div>
+        </div>
+
+        <!-- ── Stats Tab ── -->
+        <div id="atab-stats" class="admin-tab-content" hidden>
+          <h3 class="section-title"><i class="fa-solid fa-chart-pie"></i> Platform İstatistikleri</h3>
+
+          <div class="admin-stats-grid">
+            <div class="admin-stat-card">
+              <i class="fa-solid fa-ticket"></i>
+              <span class="admin-stat-value" id="astats-total">0</span>
+              <span class="admin-stat-label">Toplam Kupon</span>
+            </div>
+            <div class="admin-stat-card green">
+              <i class="fa-solid fa-circle-check"></i>
+              <span class="admin-stat-value" id="astats-won">0</span>
+              <span class="admin-stat-label">Kazanan</span>
+            </div>
+            <div class="admin-stat-card red">
+              <i class="fa-solid fa-circle-xmark"></i>
+              <span class="admin-stat-value" id="astats-lost">0</span>
+              <span class="admin-stat-label">Kaybeden</span>
+            </div>
+            <div class="admin-stat-card blue">
+              <i class="fa-solid fa-hourglass-half"></i>
+              <span class="admin-stat-value" id="astats-open">0</span>
+              <span class="admin-stat-label">Açık</span>
+            </div>
+            <div class="admin-stat-card gold">
+              <i class="fa-solid fa-users"></i>
+              <span class="admin-stat-value" id="astats-users">0</span>
+              <span class="admin-stat-label">Toplam Kullanıcı</span>
+            </div>
+            <div class="admin-stat-card purple">
+              <i class="fa-solid fa-comments"></i>
+              <span class="admin-stat-value" id="astats-comments">0</span>
+              <span class="admin-stat-label">Toplam Yorum</span>
+            </div>
+          </div>
+
+          <!-- CSV Download -->
+          <div class="csv-section">
+            <button class="btn btn-outline" onclick="downloadCSV()">
+              <i class="fa-solid fa-file-csv"></i> İstatistikleri CSV İndir
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <!-- /admin-view -->
+
+    </main>
+    <!-- /main-content -->
+
+
+    <!-- ── Bottom Navigation (Mobile) ── -->
+    <nav id="bottom-nav" class="bottom-nav" aria-label="Alt navigasyon">
+      <button class="bnav-item active" data-bnav="feed" onclick="showView('feed'); setBottomNav(this)">
+        <i class="fa-solid fa-ticket"></i>
+        <span>Kuponlar</span>
+      </button>
+      <button class="bnav-item" data-bnav="favorites" onclick="showView('favorites'); setBottomNav(this)">
+        <i class="fa-solid fa-heart"></i>
+        <span>Favoriler</span>
+      </button>
+      <button class="bnav-item" data-bnav="profile" onclick="showView('profile'); setBottomNav(this)">
+        <i class="fa-solid fa-user"></i>
+        <span>Profil</span>
+      </button>
+      <button class="bnav-item" data-bnav="admin" id="bnav-admin" onclick="showView('admin'); setBottomNav(this)" hidden>
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Admin</span>
+      </button>
+    </nav>
+    <!-- /bottom-nav -->
+
+  </div>
+  <!-- /app -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MODALS
+  ════════════════════════════════════════════════════════════ -->
+
+  <!-- ── Coupon Detail Modal ── -->
+  <div id="detail-modal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="detail-modal-title">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h2 id="detail-modal-title" class="modal-title">Kupon Detayı</h2>
+        <button class="modal-close" aria-label="Kapat" onclick="closeModal('detail-modal')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Coupon Meta -->
+        <div id="detail-meta" class="detail-meta">
+          <!-- Tarih, durum, oran, etiketler JS tarafından doldurulur -->
+        </div>
+
+        <!-- Description -->
+        <div id="detail-description" class="detail-description" hidden></div>
+
+        <!-- Match Table -->
+        <div class="detail-matches-wrapper">
+          <h3 class="detail-section-title"><i class="fa-solid fa-futbol"></i> Maçlar</h3>
+          <table class="match-table">
+            <thead>
+              <tr>
+                <th>Ev Sahibi</th>
+                <th>Deplasman</th>
+                <th>Tahmin</th>
+                <th>Oran</th>
+                <th>Sonuç</th>
+              </tr>
+            </thead>
+            <tbody id="detail-matches">
+              <!-- Maç satırları JS tarafından doldurulur -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Like / Favorite actions -->
+        <div class="detail-actions">
+          <button id="detail-like-btn" class="btn btn-outline" onclick="toggleLike()">
+            <i class="fa-regular fa-thumbs-up"></i>
+            <span id="detail-like-count">0</span> Beğen
+          </button>
+          <button id="detail-fav-btn" class="btn btn-outline" onclick="toggleFavorite()">
+            <i class="fa-regular fa-bookmark"></i> Favoriye Ekle
+          </button>
+          <button id="detail-share-btn" class="btn btn-outline" onclick="shareCoupon()">
+            <i class="fa-solid fa-share-nodes"></i> Paylaş
+          </button>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+          <h3 class="detail-section-title">
+            <i class="fa-solid fa-comments"></i> Yorumlar
+            <span id="detail-comment-count" class="comment-count-badge">0</span>
+          </h3>
+
+          <div id="comments-list" class="comments-list">
+            <!-- Yorumlar JS tarafından doldurulur -->
+          </div>
+          <div id="comments-empty" class="empty-state small" hidden>
+            <i class="fa-regular fa-comment"></i>
+            <p>Henüz yorum yok. İlk yorumu sen yap!</p>
+          </div>
+
+          <!-- Comment Form -->
+          <form id="comment-form" class="comment-form" onsubmit="handleAddComment(event)" novalidate>
+            <div class="comment-input-row">
+              <div class="comment-avatar" id="comment-avatar">U</div>
+              <textarea
+                id="comment-text"
+                class="form-input comment-textarea"
+                placeholder="Yorumunuzu yazın..."
+                rows="2"
+                maxlength="500"
+                required
+              ></textarea>
+            </div>
+            <div class="comment-form-footer">
+              <span id="comment-char-count" class="char-count">0/500</span>
+              <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-paper-plane"></i> Gönder
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- /detail-modal -->
+
+
+  <!-- ── Edit Coupon Modal ── -->
+  <div id="edit-modal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h2 id="edit-modal-title" class="modal-title">
+          <i class="fa-solid fa-pen-to-square"></i> Kuponu Düzenle
+        </h2>
+        <button class="modal-close" aria-label="Kapat" onclick="closeModal('edit-modal')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form id="edit-coupon-form" class="coupon-form" onsubmit="handleEditCoupon(event)" novalidate>
+
+          <input type="hidden" id="edit-coupon-id" />
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-title">Başlık</label>
+              <input type="text" id="edit-title" class="form-input" placeholder="Kupon başlığı" required />
+            </div>
+            <div class="form-group">
+              <label for="edit-date">Tarih</label>
+              <input type="date" id="edit-date" class="form-input" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-description">Açıklama</label>
+            <textarea id="edit-description" class="form-input form-textarea" placeholder="Kupon hakkında kısa açıklama..." rows="3"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-visibility">Görünürlük</label>
+              <select id="edit-visibility" class="form-input">
+                <option value="public">Herkese Açık</option>
+                <option value="members">Yalnızca Üyeler</option>
+                <option value="private">Gizli</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit-status">Durum</label>
+              <select id="edit-status" class="form-input">
+                <option value="open">Açık</option>
+                <option value="won">Kazandı</option>
+                <option value="lost">Kaybetti</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-tags">Etiketler</label>
+            <select id="edit-tags" class="form-input" multiple>
+              <option value="futbol">Futbol</option>
+              <option value="basketbol">Basketbol</option>
+              <option value="tenis">Tenis</option>
+              <option value="voleybol">Voleybol</option>
+              <option value="iddaa">İddaa</option>
+              <option value="canli">Canlı</option>
+              <option value="kombinasyon">Kombinasyon</option>
+              <option value="sistem">Sistem</option>
+            </select>
+            <small class="form-hint">Birden fazla seçmek için Ctrl basılı tutun</small>
+          </div>
+
+          <!-- Match Rows -->
+          <div class="matches-section">
+            <div class="matches-header">
+              <label><i class="fa-solid fa-futbol"></i> Maçlar</label>
+              <button type="button" class="btn btn-sm btn-outline" onclick="addMatchRow('edit-matches')">
+                <i class="fa-solid fa-plus"></i> Maç Ekle
+              </button>
+            </div>
+            <div id="edit-matches" class="matches-list">
+              <!-- Maç satırları JS tarafından doldurulur -->
+            </div>
+          </div>
+
+          <div id="edit-coupon-error" class="auth-error" hidden></div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+              <i class="fa-solid fa-floppy-disk"></i> Değişiklikleri Kaydet
+            </button>
+            <button type="button" class="btn btn-ghost" onclick="closeModal('edit-modal')">
+              <i class="fa-solid fa-xmark"></i> Vazgeç
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- /edit-modal -->
+
+
+  <!-- ── Custom Confirmation Modal ── -->
+  <div id="confirm-modal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2 id="confirm-modal-title" class="modal-title">Onay</h2>
+        <button class="modal-close" aria-label="Kapat" onclick="closeModal('confirm-modal')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-modal-message" class="confirm-message">Bu işlemi yapmak istediğinize emin misiniz?</p>
+        <div class="confirm-actions">
+          <button id="confirm-modal-ok" class="btn btn-danger" onclick="confirmAction()">
+            <i class="fa-solid fa-check"></i> Evet, Onayla
+          </button>
+          <button class="btn btn-ghost" onclick="closeModal('confirm-modal')">
+            <i class="fa-solid fa-xmark"></i> Vazgeç
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /confirm-modal -->
+
+
+  <!-- ── Toast Container ── -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       APP SCRIPT
+  ════════════════════════════════════════════════════════════ -->
+  <script src="app.js"></script>
+</body>
+</html>
